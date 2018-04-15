@@ -51,20 +51,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\ConsoleHelper.cs" />
-    <Compile Include="Data\Context.cs" />
-    <Compile Include="Data\Repository.cs" />
-    <Compile Include="Data\DatabaseInitializer.cs" />
-    <Compile Include="Models\Artist.cs" />
-    <Compile Include="Models\ComicBook.cs" />
-    <Compile Include="Models\ComicBookArtist.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\Series.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ComicBookShared\ComicBookShared.csproj">
+      <Project>{44ddfe26-5384-44c4-a096-880aa8956ba1}</Project>
+      <Name>ComicBookShared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
