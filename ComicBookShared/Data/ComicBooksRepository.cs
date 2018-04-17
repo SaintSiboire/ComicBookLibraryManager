@@ -26,11 +26,11 @@ namespace ComicBookShared.Data
 		}
 
 
-		public override ComicBook Get(int id, bool includedRelatedEntities = true)
+		public override ComicBook Get(int id, bool includeRelatedEntities = true)
 		{
 			var comicBooks = Context.ComicBooks.AsQueryable();
 
-			if (includedRelatedEntities)
+			if (includeRelatedEntities)
 			{
 				comicBooks = comicBooks
 					.Include(cb => cb.Series)
