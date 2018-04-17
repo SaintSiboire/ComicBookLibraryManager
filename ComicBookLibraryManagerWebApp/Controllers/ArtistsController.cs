@@ -148,7 +148,8 @@ namespace ComicBookLibraryManagerWebApp.Controllers
 				// Then make sure that the provided name is unique.
 				// TODO Call method to check if the artist name is available.
 				if (Context.Artists
-							.Any(a => a.Name == artist.Name))
+							.Any(a => a.Name == artist.Name &&
+									  a.Id != artist.Id))
 				{
 					ModelState.AddModelError("Name",
 						"The provided Name is in use by another artist.");
