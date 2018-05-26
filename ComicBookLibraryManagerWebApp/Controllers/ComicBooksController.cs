@@ -199,7 +199,7 @@ namespace ComicBookLibraryManagerWebApp.Controllers
 				}
 				else
 				{
-					message = "The comic book being deleted has already been deleted by another user. If you still want to delete the comic book than click the 'Delete' button again. Otherwise click the 'Cancel' button to return to the detail page.";
+					message = "The comic book being deleted has already been updated by another user. If you still want to delete the comic book than click the 'Delete' button again. Otherwise click the 'Cancel' button to return to the detail page.";
 
 					viewModel.ComicBook.RowVersion = ((ComicBook)entityPropertyValues.ToObject()).RowVersion;
 				}
