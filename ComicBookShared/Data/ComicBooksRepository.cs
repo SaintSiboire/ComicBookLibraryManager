@@ -19,6 +19,7 @@ namespace ComicBookShared.Data
 		public override IList<ComicBook> GetList()
 		{
 			return Context.ComicBooks
+				.AsNoTracking() //disable the context automatic relationship fix up
 				.Include(cb => cb.Series)
 				.OrderBy(cb => cb.Series.Title)
 				.ThenBy(cb => cb.IssueNumber)
@@ -39,19 +40,48 @@ namespace ComicBookShared.Data
 
 		public override ComicBook Get(int id, bool includeRelatedEntities = true)
 		{
-			var comicBooks = Context.ComicBooks.AsQueryable();
+			var comicBook = Context.ComicBooks
+				.Where(cb => cb.Id == id)
+				.SingleOrDefault();
 
-			if (includeRelatedEntities)
+			if(includeRelatedEntities)
 			{
-				comicBooks = comicBooks
-					.Include(cb => cb.Series)
-					.Include(cb => cb.Artists.Select(a => a.Artist))
-					.Include(cb => cb.Artists.Select(a => a.Role));
+
+				//context automatic relationship fix up example
+				Context.Series
+					.Where(s => s.Id == comicBook.SeriesId)
+					.Single();
+
+				Context.ComicBookArtists
+					.Include(cba => cba.Artist)
+					.Include(cba => cba.Role)
+					.Where(cba => cba.ComicBookId == id)
+					.ToList();
+
+				//var comicBookEntry = Context.Entry(comicBook);
+
+				//comicBookEntry.Reference(cb => cb.Series).Load();
+				//comicBookEntry.Collection(cb => cb.Artists)
+				//	.Query()
+				//	.Include(a => a.Artist)
+				//	.Include(a => a.Role)
+				//	.ToList();
 			}
 
-			return comicBooks
-					.Where(cb => cb.Id == id)
-					.SingleOrDefault();
+			return comicBook;
+			//var comicBooks = Context.ComicBooks.AsQueryable();
+
+			//if (includeRelatedEntities)
+			//{
+			//	comicBooks = comicBooks
+			//		.Include(cb => cb.Series)
+			//		.Include(cb => cb.Artists.Select(a => a.Artist))
+			//		.Include(cb => cb.Artists.Select(a => a.Role));
+			//}
+
+			//return comicBooks
+			//		.Where(cb => cb.Id == id)
+			//		.SingleOrDefault();
 		}
 
 		public bool ComicBookSeriesHasIssueNumber(int comicBookId, int seriesId, int issueNumber)
