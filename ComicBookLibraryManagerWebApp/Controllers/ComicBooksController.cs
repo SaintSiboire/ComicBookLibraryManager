@@ -99,6 +99,7 @@ namespace ComicBookLibraryManagerWebApp.Controllers
             {
                 ComicBook = comicBook
             };
+
             viewModel.Init(Repository);
 
             return View(viewModel);
@@ -113,11 +114,36 @@ namespace ComicBookLibraryManagerWebApp.Controllers
             {
                 var comicBook = viewModel.ComicBook;
 
-				_comicBooksRepository.Update(comicBook);
+				try
+				{
+					_comicBooksRepository.Update(comicBook);
 
-                TempData["Message"] = "Your comic book was successfully updated!";
+					TempData["Message"] = "Your comic book was successfully updated!";
 
-                return RedirectToAction("Detail", new { id = comicBook.Id });
+					return RedirectToAction("Detail", new { id = comicBook.Id });
+				}
+				catch (DbUpdateConcurrencyException ex)
+				{
+					string message = null;
+
+					var entityPropertyValues = ex.Entries.Single().GetDatabaseValues();
+
+					if(entityPropertyValues == null)
+					{
+						message = "The comic book being updated has been deleted by another user. Click the 'Cancel' Button to return to the list page.";
+
+						viewModel.ComicBookHasBeenDeleted = true;
+					}
+					else
+					{
+						message = "The comic book being updated has already been updated by another user. If you still want to make your changes than click the 'Save' button again. Otherwise click the 'Cancel' button to discard your changes.";
+
+						comicBook.RowVersion = ((ComicBook)entityPropertyValues.ToObject()).RowVersion;
+					}
+
+					ModelState.AddModelError(string.Empty, message);
+				}
+
             }
 
             viewModel.Init(Repository);
@@ -139,18 +165,50 @@ namespace ComicBookLibraryManagerWebApp.Controllers
                 return HttpNotFound();
             }
 
-            return View(comicBook);
+			var viewModel = new ComicBooksDeleteViewModel()
+			{
+				ComicBook = comicBook
+			};
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(ComicBooksDeleteViewModel viewModel)
         {
+			try
+			{
+				_comicBooksRepository.Delete(viewModel.ComicBook.Id,viewModel.ComicBook.RowVersion);
 
-			_comicBooksRepository.Delete(id);
+				TempData["Message"] = "Your comic book was successfully deleted!";
 
-            TempData["Message"] = "Your comic book was successfully deleted!";
+				return RedirectToAction("Index");
 
-            return RedirectToAction("Index");
+			}
+			catch (DbUpdateConcurrencyException ex)
+			{
+				string message = null;
+
+				var entityPropertyValues = ex.Entries.Single().GetDatabaseValues();
+
+				if (entityPropertyValues == null)
+				{
+					message = "The comic book being deleted has been deleted by another user. Click the 'Cancel' Button to return to the list page.";
+
+					viewModel.ComicBookHasBeenDeleted = true;
+				}
+				else
+				{
+					message = "The comic book being deleted has already been deleted by another user. If you still want to delete the comic book than click the 'Delete' button again. Otherwise click the 'Cancel' button to return to the detail page.";
+
+					viewModel.ComicBook.RowVersion = ((ComicBook)entityPropertyValues.ToObject()).RowVersion;
+				}
+
+				ModelState.AddModelError(string.Empty, message);
+
+				return View(viewModel);
+			}
+
         }
 
         /// <summary>

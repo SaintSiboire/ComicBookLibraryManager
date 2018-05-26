@@ -23,5 +23,10 @@ namespace ComicBookLibraryManagerWebApp.ViewModels
             get { return ComicBook.Id; }
             set { ComicBook.Id = value; }
         }
-    }
+
+		/// <summary>
+		/// To indicate that the entity has been deleted, to avoid a 404 error when trying to return the view
+		/// </summary>
+		public bool ComicBookHasBeenDeleted { get; set; }
+	}
 }

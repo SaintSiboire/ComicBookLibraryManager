@@ -25,6 +25,17 @@ namespace ComicBookShared.Data
 				.ToList();
 		}
 
+		public void Delete(int id, byte[] rowVersion)
+		{
+			var comicBook = new ComicBook()
+			{
+				Id = id,
+				RowVersion = rowVersion
+			};
+
+			Context.Entry(comicBook).State = EntityState.Deleted;
+			Context.SaveChanges();
+		}
 
 		public override ComicBook Get(int id, bool includeRelatedEntities = true)
 		{
